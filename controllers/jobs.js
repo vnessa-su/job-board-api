@@ -5,36 +5,74 @@ const router = express.Router();
 
 // INDEX
 // GET api/jobs
-router.get("/", (req, res) => {
-    Job.find().then((jobs) => res.json(jobs));
+router.get("/", (req, res, next) => {
+    Job.find()
+        .then((jobs) => {
+            if (!job) {
+                res.sendStatus(404);
+            } else {
+                res.json(job);
+            }
+        })
+        .catch(next);
 });
 
 // SHOW
 // GET api/jobs/5a7db6c74d55bc51bdf39793
-router.get("/:id", (req, res) => {
-    Job.findById(req.params.id).then((job) => res.json(job));
+router.get("/:id", (req, res, next) => {
+    Job.findById(req.params.id)
+        .then((job) => {
+            Job.find().then((jobs) => {
+                if (!job) {
+                    res.sendStatus(404);
+                } else {
+                    res.json(job);
+                }
+            });
+        })
+        .catch(next);
 });
 
 // CREATE
 // POST api/jobs
-router.post("/", (req, res) => {
-    Job.create(req.body).then((job) => res.json(job));
+router.post("/", (req, res, next) => {
+    Job.create(req.body)
+        .then((job) => res.status(201).json(job))
+        .catch(next);
 });
 
 // UPDATE
 // PUT api/jobs/5a7db6c74d55bc51bdf39793
-router.put("/:id", (req, res) => {
+router.put("/:id", (req, res, next) => {
     Job.findOneAndUpdate({ _id: req.params.id }, req.body, {
         new: true,
-    }).then((job) => res.json(job));
+    })
+        .then((job) => {
+            Job.find().then((jobs) => {
+                if (!job) {
+                    res.sendStatus(404);
+                } else {
+                    res.json(job);
+                }
+            });
+        })
+        .catch(next);
 });
 
 // DESTROY
 // DELETE api/jobs/5a7db6c74d55bc51bdf39793
-router.delete("/:id", (req, res) => {
+router.delete("/:id", (req, res, next) => {
     Job.findOneAndDelete({
         _id: req.params.id,
-    }).then((job) => res.json(job));
+    })
+        .then((job) => {
+            if (!job) {
+                res.sendStatus(404);
+            } else {
+                res.json(job);
+            }
+        })
+        .catch(next);
 });
 
 module.exports = router;
