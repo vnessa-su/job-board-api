@@ -99,6 +99,16 @@ const handleErrors = (err, req, res, next) => {
     res.status(statusCode).send(message);
 };
 
+const handleValidateOwnership = (req, document) => {
+    const ownerId = document.owner._id || document.owner;
+    // Check if the current user is also the owner of the document
+    if (!req.user._id.equals(ownerId)) {
+        throw new OwnershipError();
+    } else {
+        return document;
+    }
+};
+
 module.exports = {
     handleValidateOwnership,
     handleRecordExists,
