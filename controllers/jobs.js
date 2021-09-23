@@ -1,5 +1,6 @@
 const express = require("express");
 const Job = require("../models/Job");
+const { handleValidateId } = require("../middleware/custom_errors");
 
 const router = express.Router();
 
@@ -19,8 +20,9 @@ router.get("/", (req, res, next) => {
 
 // SHOW
 // GET api/jobs/5a7db6c74d55bc51bdf39793
-router.get("/:id", (req, res, next) => {
+router.get("/:id", handleValidateId, (req, res, next) => {
     Job.findById(req.params.id)
+        .then(handleRecordExists)
         .then((job) => {
             Job.find().then((jobs) => {
                 if (!job) {
@@ -43,10 +45,11 @@ router.post("/", (req, res, next) => {
 
 // UPDATE
 // PUT api/jobs/5a7db6c74d55bc51bdf39793
-router.put("/:id", (req, res, next) => {
+router.put("/:id", handleValidateId, (req, res, next) => {
     Job.findOneAndUpdate({ _id: req.params.id }, req.body, {
         new: true,
     })
+        .then(handleRecordExists)
         .then((job) => {
             Job.find().then((jobs) => {
                 if (!job) {
@@ -61,10 +64,11 @@ router.put("/:id", (req, res, next) => {
 
 // DESTROY
 // DELETE api/jobs/5a7db6c74d55bc51bdf39793
-router.delete("/:id", (req, res, next) => {
+router.delete("/:id", handleValidateId, (req, res, next) => {
     Job.findOneAndDelete({
         _id: req.params.id,
     })
+        .then(handleRecordExists)
         .then((job) => {
             if (!job) {
                 res.sendStatus(404);
