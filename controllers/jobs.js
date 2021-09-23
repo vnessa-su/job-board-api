@@ -1,6 +1,9 @@
 const express = require("express");
 const Job = require("../models/Job");
-const { handleValidateId } = require("../middleware/custom_errors");
+const {
+    handleValidateId,
+    handleRecordExists,
+} = require("../middleware/custom_errors");
 
 const router = express.Router();
 
@@ -8,11 +11,12 @@ const router = express.Router();
 // GET api/jobs
 router.get("/", (req, res, next) => {
     Job.find()
+        .populate("owner", "email -_id")
         .then((jobs) => {
-            if (!job) {
+            if (!jobs) {
                 res.sendStatus(404);
             } else {
-                res.json(job);
+                res.json(jobs);
             }
         })
         .catch(next);
@@ -22,6 +26,7 @@ router.get("/", (req, res, next) => {
 // GET api/jobs/5a7db6c74d55bc51bdf39793
 router.get("/:id", handleValidateId, (req, res, next) => {
     Job.findById(req.params.id)
+        .populate("owner")
         .then(handleRecordExists)
         .then((job) => {
             Job.find().then((jobs) => {
