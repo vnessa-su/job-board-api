@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const jobsController = require("./controllers/jobs");
+const usersController = require("./controllers/users");
 const {
     handleErrors,
     handleValidationErrors,
@@ -13,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/jobs", jobsController);
+app.use("/api", usersController);
 app.use(handleValidationErrors);
 app.use(handleErrors);
 
