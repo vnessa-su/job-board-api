@@ -52,9 +52,13 @@ class InvalidIdError extends Error {
     }
 }
 
-const handleValidateOwnership = (requestObject, resource) => {
-    if (!requestObject.user._id.equals(resource.owner)) {
+const handleValidateOwnership = (req, document) => {
+    const ownerId = document.owner._id || document.owner;
+    // Check if the current user is also the owner of the document
+    if (!req.user._id.equals(ownerId)) {
         throw new OwnershipError();
+    } else {
+        return document;
     }
 };
 
@@ -97,16 +101,6 @@ const handleErrors = (err, req, res, next) => {
     const message = err.message || "Internal Server Error";
     // Set the status and send the message as a response to the client
     res.status(statusCode).send(message);
-};
-
-const handleValidateOwnership = (req, document) => {
-    const ownerId = document.owner._id || document.owner;
-    // Check if the current user is also the owner of the document
-    if (!req.user._id.equals(ownerId)) {
-        throw new OwnershipError();
-    } else {
-        return document;
-    }
 };
 
 module.exports = {
